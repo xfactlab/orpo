@@ -4,16 +4,21 @@ This is the official repository for <a class="link" href="https://arxiv.org/abs/
 
 &nbsp;
 
-**`Model Checkpoints`**
+### **`Model Checkpoints`**
 
 Our models trained with ORPO can be found in:
 
 - [X] **Mistral-ORPO-⍺**: 🤗 <a class="link" href="https://huggingface.co/kaist-ai/mistral-orpo-alpha">kaist-ai/mistral-orpo-alpha</a>
 - [X] **Mistral-ORPO-β**: 🤗 <a class="link" href="https://huggingface.co/kaist-ai/mistral-orpo-beta">kaist-ai/mistral-orpo-beta</a>
 
+And the corresponding logs for the average log probabilities of chosen/rejected responses during training are reported in:
+
+- [X] **Mistral-ORPO-⍺**: <a class="link" href="https://wandb.ai/jiwooya1000/PREF/reports/Mistral-ORPO-7B-Training-Log--Vmlldzo3MTE1NzE0?accessToken=rms6o4mg5vo3feu1bvbpk632m4cspe19l0u1p4he3othx5bgean82chn9neiile6">Wandb Report for Mistral-ORPO-⍺</a>
+- [X] **Mistral-ORPO-β**: <a class="link" href="https://wandb.ai/jiwooya1000/PREF/reports/Mistral-ORPO-7B-Training-Log--Vmlldzo3MTE3MzMy?accessToken=dij4qbp6dcrofsanzbgobjsne9el8a2zkly2u5z82rxisd4wiwv1rhp0s2dub11e">Wandb Report for Mistral-ORPO-β</a>
+
 &nbsp;
 
-**`AlpacaEval`**
+### **`AlpacaEval`**
 
 <figure>
   <img class="png" src="/assets/img/alpaca_blog.png" alt="Description of the image">
@@ -22,7 +27,7 @@ Our models trained with ORPO can be found in:
 
 &nbsp;
 
-**`MT-Bench`**
+### **`MT-Bench`**
 
 <figure>
   <img class="png" src="/assets/img/mtbench_hf.png" alt="Description of the image">
@@ -30,7 +35,10 @@ Our models trained with ORPO can be found in:
 </figure>
 
 &nbsp;
-**`IFEval`**
+
+### **`IFEval`**
+
+IFEval scores are measured with <a class="link" href="https://github.com/EleutherAI/lm-evaluation-harness">EleutherAI/lm-evaluation-harness</a> by applying the chat template. The scores for Llama-2-Chat (70B), Zephyr-β (7B), and Mixtral-8X7B-Instruct-v0.1 are originally reported in <a class="link" href="https://twitter.com/wiskojo/status/1739767758462877823">this tweet</a>.
 
 | **Model Type**     | **Prompt-Strict** | **Prompt-Loose** | **Inst-Strict** | **Inst-Loose** |
 |--------------------|:-----------------:|:----------------:|:---------------:|----------------|
