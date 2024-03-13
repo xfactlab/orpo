@@ -4,7 +4,7 @@
 #SBATCH --cpus-per-gpu=8
 
 
-accelerate launch --config_file ./src/accelerate/ds2.yaml main.py \
+accelerate launch --config_file ./src/accelerate/fsdp.yaml main.py \
     --lr 5e-6 \
     --warmup_steps 100 \
     --model_name facebook/opt-1.3b \

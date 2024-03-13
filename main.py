@@ -33,19 +33,25 @@ class ORPO(object):
         self.tokenizer.pad_token_id = self.tokenizer.eos_token_id
 
         # Load Model
-        print(">>> 2. Loading Tokenizer")
-        self.model = AutoModelForCausalLM.from_pretrained(self.args.model_name, 
-                                                          cache_dir=self.args.cache_dir,
-                                                          torch_dtype=torch.bfloat16,
-                                                          attn_implementation="flash_attention_2")
+        print(">>> 2. Loading Model")
+        if self.args.flash_attention_2:
+            self.model = AutoModelForCausalLM.from_pretrained(self.args.model_name, 
+                                                              cache_dir=self.args.cache_dir,
+                                                              torch_dtype=torch.bfloat16,
+                                                              attn_implementation="flash_attention_2")
+        else:
+            self.model = AutoModelForCausalLM.from_pretrained(self.args.model_name, 
+                                                              cache_dir=self.args.cache_dir,
+                                                              torch_dtype=torch.bfloat16)
+                                                          
         # Load Dataset
         print(">>> 3. Loading Dataset")
         self.data = load_dataset(self.args.data_name, cache_dir=self.args.cache_dir)
 
         # Preprocess Dataset
         print(">>> 4. Filtering and Preprocessing Dataset")
-        train_split = "train_prefs" if 'uf' in self.args.data_name.lower() else "train"
-        test_split = "test_prefs" if 'uf' in self.args.data_name.lower() else "test"
+        train_split = "train_prefs" if 'binarized' in self.args.data_name.lower() else "train"
+        test_split = "test_prefs" if 'binarized' in self.args.data_name.lower() else "test"
 
         train = self.data[train_split].filter(self.filter_dataset)
         test = self.data[test_split].filter(self.filter_dataset)
@@ -68,20 +74,20 @@ class ORPO(object):
         rejected = [self.tokenizer.apply_chat_template(item, tokenize=False) for item in examples['rejected']]
     
         model_inputs = self.tokenizer(prompt,
-                                max_length=self.args.response_max_length,
-                                padding='max_length',
-                                truncation=True,
-                                return_tensors='pt')
+                                      max_length=self.args.response_max_length,
+                                      padding='max_length',
+                                      truncation=True,
+                                      return_tensors='pt')
         pos_labels = self.tokenizer(chosen,
-                            max_length=self.args.response_max_length,
-                            padding='max_length',
-                            truncation=True,
-                            return_tensors='pt')
+                                    max_length=self.args.response_max_length,
+                                    padding='max_length',
+                                    truncation=True,
+                                    return_tensors='pt')
         neg_labels = self.tokenizer(rejected,
-                            max_length=self.args.response_max_length,
-                            padding='max_length',
-                            truncation=True,
-                            return_tensors='pt') 
+                                    max_length=self.args.response_max_length,
+                                    padding='max_length',
+                                    truncation=True,
+                                    return_tensors='pt') 
                 
         model_inputs['positive_input_ids'] = pos_labels['input_ids']
         model_inputs['positive_attention_mask'] = pos_labels['attention_mask']
@@ -100,7 +106,7 @@ class ORPO(object):
     def prepare_trainer(self):
         wandb.init(name=self.run_name)
         arguments = TrainingArguments(
-            torch_compile=False,
+            torch_compile=self.args.torch_compile,
             output_dir=self.save_dir,  # The output directory
             logging_dir=self.log_dir,
             logging_steps=50,
