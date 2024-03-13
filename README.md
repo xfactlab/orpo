@@ -12,7 +12,7 @@ Our models trained with ORPO can be found in:
 **`AlpacaEval`**
 
 <figure>
-  <img class="png" src="/assets/img/ORPO_main.drawio.png" alt="Description of the image">
+  <img class="png" src="/assets/img/alpaca_blog.png" alt="Description of the image">
   <figcaption><b>Figure 1.</b> AlpacaEval\(\text{}_{2.0}\) score of <b>\(\texttt{ORPO}\)-Llama-2 (7B)</b>, 🤗 <b>Mistral-\(\texttt{ORPO}\)-\(\alpha\) (7B)</b>, and 🤗 <b>Mistral-\(\texttt{ORPO}\)-\(\beta\) (7B)</b> compared to RLHF and DPO models. They surpass RLHF and DPO-tuned models, respectively.</figcaption>
 </figure>
 
