@@ -1,6 +1,10 @@
 # **ORPO**
 
-This is the official repository for <a class="link" href="https://arxiv.org/abs/2403.07691">**Reference-free Monolithic Preference Optimization with Odds Ratio**</a>.
+This is the official repository for <a class="link" href="https://arxiv.org/abs/2403.07691">**Reference-free Monolithic Preference Optimization with Odds Ratio**</a>. The detailed results in the paper can be found in:
+- [Open LLM Leaderboard](https://huggingface.co/spaces/HuggingFaceH4/open_llm_leaderboard?query=kaist-ai%2Fmistral-orpo-beta)
+- [AlpacaEval](#alpacaeval)
+- [MT-Bench](#mt-bench)
+- [IFEval](#ifeval)
 
 &nbsp;
 
