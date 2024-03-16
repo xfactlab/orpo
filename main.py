@@ -141,7 +141,7 @@ class ORPO(object):
             gradient_accumulation_steps=self.args.gradient_accumulation_steps,
             gradient_checkpointing=True, #if ('llama' in self.args.model_name.lower()) or ('mistral' in self.args.model_name.lower()) else False,
             gradient_checkpointing_kwargs={'use_reentrant':True},
-            load_best_model_at_end=True,
+            load_best_model_at_end=self.is_test,
             do_train=True,
             do_eval=self.is_test,
             lr_scheduler_type=self.args.lr_scheduler_type,
