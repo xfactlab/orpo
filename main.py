@@ -58,7 +58,7 @@ class ORPO(object):
         else:
             self.is_test = True
             train_split = data_split[0]
-            test_split = data_split[0]
+            test_split = data_split[1]
 
             test = self.data[test_split].filter(self.filter_dataset)
             self.test = test.map(self.preprocess_dataset, batched=True, num_proc=self.args.num_proc, remove_columns=self.data[test_split].column_names)       
@@ -68,7 +68,7 @@ class ORPO(object):
         self.train = train.map(self.preprocess_dataset, batched=True, num_proc=self.args.num_proc, remove_columns=self.data[train_split].column_names)                       
                 
         # Set WANDB & Logging Configurations
-        self.run_name = f"{self.args.model_name.split('/')[-1]}-{self.args.data_name.split('/')[-1]}-ORPO-{self.start.tm_mday}-{self.start.tm_hour}-{self.start.tm_min}"
+        self.run_name = f"{self.args.model_name.split('/')[-1]}-{self.args.data_name.split('/')[-1]}-lambda{self.args.alpha}-ORPO-{self.start.tm_mday}-{self.start.tm_hour}-{self.start.tm_min}"
         self.save_dir = os.path.join('./checkpoints/', f"{self.args.data_name.split('/')[-1]}/{self.run_name}")
         self.log_dir = os.path.join('./checkpoints/', f"{self.args.data_name.split('/')[-1]}/{self.run_name}/logs")
         
@@ -143,7 +143,7 @@ class ORPO(object):
             gradient_checkpointing_kwargs={'use_reentrant':True},
             load_best_model_at_end=True,
             do_train=True,
-            do_eval= self.is_test,
+            do_eval=self.is_test,
             lr_scheduler_type=self.args.lr_scheduler_type,
             remove_unused_columns=False,
             report_to='wandb',
