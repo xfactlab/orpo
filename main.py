@@ -15,7 +15,7 @@ from transformers import (
 
 from src.args import default_args
 from src.orpo_trainer import ORPOTrainer
-from src.utils import preprocess_logits_for_metrics
+from src.utils import preprocess_logits_for_metrics, dataset_split_selector
 
 class ORPO(object):
     def __init__(self, args) -> None:
@@ -50,16 +50,23 @@ class ORPO(object):
 
         # Preprocess Dataset
         print(">>> 4. Filtering and Preprocessing Dataset")
-        train_split = "train_prefs" if 'binarized' in self.args.data_name.lower() else "train"
-        test_split = "test_prefs" if 'binarized' in self.args.data_name.lower() else "test"
+        data_split = dataset_split_selector(self.data)
+
+        if len(data_split) == 1:
+            self.is_test = False
+            train_split = data_split[0]
+        else:
+            self.is_test = True
+            train_split = data_split[0]
+            test_split = data_split[0]
+
+            test = self.data[test_split].filter(self.filter_dataset)
+            self.test = test.map(self.preprocess_dataset, batched=True, num_proc=self.args.num_proc, remove_columns=self.data[test_split].column_names)       
 
         train = self.data[train_split].filter(self.filter_dataset)
-        test = self.data[test_split].filter(self.filter_dataset)
         print(f"\n\n>>> {len(train)} / {len(self.data[train_split])} rows left after filtering by prompt length.")
-
-        self.train = train.map(self.preprocess_dataset, batched=True, num_proc=self.args.num_proc, remove_columns=self.data[train_split].column_names)
-        self.test = test.map(self.preprocess_dataset, batched=True, num_proc=self.args.num_proc, remove_columns=self.data[test_split].column_names)                              
-            
+        self.train = train.map(self.preprocess_dataset, batched=True, num_proc=self.args.num_proc, remove_columns=self.data[train_split].column_names)                       
+                
         # Set WANDB & Logging Configurations
         self.run_name = f"{self.args.model_name.split('/')[-1]}-{self.args.data_name.split('/')[-1]}-ORPO-{self.start.tm_mday}-{self.start.tm_hour}-{self.start.tm_min}"
         self.save_dir = os.path.join('./checkpoints/', f"{self.args.data_name.split('/')[-1]}/{self.run_name}")
@@ -69,9 +76,15 @@ class ORPO(object):
         os.makedirs(self.log_dir, exist_ok=True)
 
     def preprocess_dataset(self, examples: Union[List, Dict]):
-        prompt = [self.tokenizer.apply_chat_template([item[0]], tokenize=False, add_generation_prompt=True) for item in examples['chosen']]
-        chosen = [self.tokenizer.apply_chat_template(item, tokenize=False) for item in examples['chosen']]
-        rejected = [self.tokenizer.apply_chat_template(item, tokenize=False) for item in examples['rejected']]
+        if 'instruction' in examples.keys():
+            prompt_key = 'instruction'
+            prompt = [self.tokenizer.apply_chat_template([{'role': 'user', 'content': item}], tokenize=False, add_generation_prompt=True) for item in examples[prompt_key]]
+            chosen = [self.tokenizer.apply_chat_template([{'role': 'user', 'content': item_prompt}, {'role': 'assistant', 'content': item_chosen}], tokenize=False) for item_prompt, item_chosen in zip(examples[prompt_key], examples['chosen'])]
+            rejected = [self.tokenizer.apply_chat_template([{'role': 'user', 'content': item_prompt}, {'role': 'assistant', 'content': item_rejected}], tokenize=False) for item_prompt, item_rejected in zip(examples[prompt_key], examples['rejected'])]
+        else:
+            prompt = [self.tokenizer.apply_chat_template([item[0]], tokenize=False, add_generation_prompt=True) for item in examples['chosen']]
+            chosen = [self.tokenizer.apply_chat_template(item, tokenize=False) for item in examples['chosen']]
+            rejected = [self.tokenizer.apply_chat_template(item, tokenize=False) for item in examples['rejected']]
     
         model_inputs = self.tokenizer(prompt,
                                       max_length=self.args.response_max_length,
@@ -98,7 +111,13 @@ class ORPO(object):
         return model_inputs
 
     def filter_dataset(self, examples: Union[List, Dict]):
-        if self.tokenizer.apply_chat_template([examples['chosen'][0]], tokenize=True, add_generation_prompt=True, return_tensors='pt').size(-1) < self.args.prompt_max_length:    
+        if 'instruction' in examples.keys():
+            query = examples['instruction']
+            prompt_length = self.tokenizer.apply_chat_template([{'content': query, 'role': 'user'}], tokenize=True, add_generation_prompt=True, return_tensors='pt').size(-1)
+        else:
+            prompt_length = self.tokenizer.apply_chat_template([examples['chosen'][0]], tokenize=True, add_generation_prompt=True, return_tensors='pt').size(-1)  
+           
+        if prompt_length < self.args.prompt_max_length:    
             return True
         else:
             return False
@@ -124,7 +143,7 @@ class ORPO(object):
             gradient_checkpointing_kwargs={'use_reentrant':True},
             load_best_model_at_end=True,
             do_train=True,
-            do_eval= True,
+            do_eval= self.is_test,
             lr_scheduler_type=self.args.lr_scheduler_type,
             remove_unused_columns=False,
             report_to='wandb',
@@ -140,7 +159,7 @@ class ORPO(object):
             pad=self.tokenizer.pad_token_id,
             args=arguments,
             train_dataset=self.train,
-            eval_dataset=self.test,
+            eval_dataset=self.test if self.is_test else None,
             data_collator=data_collator,
             preprocess_logits_for_metrics=preprocess_logits_for_metrics
         )
