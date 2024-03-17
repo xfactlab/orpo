@@ -5,7 +5,7 @@ def default_args(parser):
     parser.add_argument("--model_name", default="gpt2", type=str)
 
     # Training Arguments
-    parser.add_argument("--torch_compile", default=True, type=bool)
+    parser.add_argument("--torch_compile", default=False, type=bool)
     parser.add_argument("--flash_attention_2", action='store_true')
     parser.add_argument("--lr_scheduler_type", default="cosine", type=str)
     parser.add_argument("--optim", default="paged_adamw_32bit", type=str)
