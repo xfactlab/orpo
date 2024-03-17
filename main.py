@@ -55,6 +55,7 @@ class ORPO(object):
         if len(data_split) == 1:
             self.is_test = False
             train_split = data_split[0]
+            print(f"   >>> Test Set = {self.is_test}")
         else:
             self.is_test = True
             train_split = data_split[0]
@@ -134,7 +135,7 @@ class ORPO(object):
             num_train_epochs=self.args.num_train_epochs,  # number of training epochs
             per_device_train_batch_size=self.args.per_device_train_batch_size,  # batch size for training
             per_device_eval_batch_size=self.args.per_device_eval_batch_size,  # batch size for evaluation
-            evaluation_strategy=self.args.evaluation_strategy,  # batch size for evaluation
+            evaluation_strategy=self.args.evaluation_strategy if self.is_test else 'no',  # batch size for evaluation
             save_strategy=self.args.evaluation_strategy,
             optim=self.args.optim,
             warmup_steps=self.args.warmup_steps,
