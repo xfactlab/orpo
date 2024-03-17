@@ -2,3 +2,7 @@ wandb
 src/__pycache__
 scripts/run_orpo.sh
 src/accelerate/fsdp.yaml
+scripts/run_orpo.sh
+src/__pycache__/args.cpython-311.pyc
+src/__pycache__/utils.cpython-311.pyc
+src/accelerate/fsdp.yaml

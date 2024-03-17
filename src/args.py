@@ -22,7 +22,7 @@ def default_args(parser):
     parser.add_argument("--save_strategy", default='epoch', type=str)
     parser.add_argument("--prompt_max_length", default=256, type=int)
     parser.add_argument("--response_max_length", default=1024, type=int)
-    parser.add_argument("--alpha", default=1.0, type=float)
+    parser.add_argument("--alpha", default=1.0, type=float, help="Hyperparameter for weighting L_OR")
 
     # Wandb Configurations
     parser.add_argument("--wandb_entity", default=None, type=str)

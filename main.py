@@ -55,10 +55,11 @@ class ORPO(object):
         if len(data_split) == 1:
             self.is_test = False
             train_split = data_split[0]
+            print(f"   >>> Test Set = {self.is_test}")
         else:
             self.is_test = True
             train_split = data_split[0]
-            test_split = data_split[0]
+            test_split = data_split[1]
 
             test = self.data[test_split].filter(self.filter_dataset)
             self.test = test.map(self.preprocess_dataset, batched=True, num_proc=self.args.num_proc, remove_columns=self.data[test_split].column_names)       
@@ -68,7 +69,7 @@ class ORPO(object):
         self.train = train.map(self.preprocess_dataset, batched=True, num_proc=self.args.num_proc, remove_columns=self.data[train_split].column_names)                       
                 
         # Set WANDB & Logging Configurations
-        self.run_name = f"{self.args.model_name.split('/')[-1]}-{self.args.data_name.split('/')[-1]}-ORPO-{self.start.tm_mday}-{self.start.tm_hour}-{self.start.tm_min}"
+        self.run_name = f"{self.args.model_name.split('/')[-1]}-{self.args.data_name.split('/')[-1]}-lambda{self.args.alpha}-ORPO-{self.start.tm_mday}-{self.start.tm_hour}-{self.start.tm_min}"
         self.save_dir = os.path.join('./checkpoints/', f"{self.args.data_name.split('/')[-1]}/{self.run_name}")
         self.log_dir = os.path.join('./checkpoints/', f"{self.args.data_name.split('/')[-1]}/{self.run_name}/logs")
         
@@ -134,16 +135,16 @@ class ORPO(object):
             num_train_epochs=self.args.num_train_epochs,  # number of training epochs
             per_device_train_batch_size=self.args.per_device_train_batch_size,  # batch size for training
             per_device_eval_batch_size=self.args.per_device_eval_batch_size,  # batch size for evaluation
-            evaluation_strategy=self.args.evaluation_strategy,  # batch size for evaluation
+            evaluation_strategy=self.args.evaluation_strategy if self.is_test else 'no',  # batch size for evaluation
             save_strategy=self.args.evaluation_strategy,
             optim=self.args.optim,
             warmup_steps=self.args.warmup_steps,
             gradient_accumulation_steps=self.args.gradient_accumulation_steps,
             gradient_checkpointing=True, #if ('llama' in self.args.model_name.lower()) or ('mistral' in self.args.model_name.lower()) else False,
             gradient_checkpointing_kwargs={'use_reentrant':True},
-            load_best_model_at_end=True,
+            load_best_model_at_end=self.is_test,
             do_train=True,
-            do_eval= self.is_test,
+            do_eval=self.is_test,
             lr_scheduler_type=self.args.lr_scheduler_type,
             remove_unused_columns=False,
             report_to='wandb',
