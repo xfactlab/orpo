@@ -126,7 +126,6 @@ class ORPO(object):
     def prepare_trainer(self):
         wandb.init(name=self.run_name)
         arguments = TrainingArguments(
-            torch_compile=self.args.torch_compile,
             output_dir=self.save_dir,  # The output directory
             logging_dir=self.log_dir,
             logging_steps=50,
