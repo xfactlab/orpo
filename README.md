@@ -1,6 +1,19 @@
 # **ORPO**
 
-This is the official repository for <a class="link" href="https://arxiv.org/abs/2403.07691">**Reference-free Monolithic Preference Optimization with Odds Ratio**</a>. The detailed results in the paper can be found in:
+This is the official repository for <a class="link" href="https://arxiv.org/abs/2403.07691">**ORPO: Monolithic Preference Optimization without Reference Model**</a>. 
+
+<details>
+<summary><b>UPDATES (2023.03.18)</b></summary>
+<div markdown="1">
+
+- [X] FSDP model saving error: Resolved checkpoint saving error which originates from the conflict between FSDP and `torch.compile`
+- [X] Now **Mistral-ORPO-β** is in the <a class="link" href="https://tatsu-lab.github.io/alpaca_eval/">official AlpacaEval Leaderboard!</a>
+
+</div>
+</details>
+&nbsp;
+
+The detailed results in the paper can be found in:
 - [Open LLM Leaderboard](https://huggingface.co/spaces/HuggingFaceH4/open_llm_leaderboard?query=kaist-ai%2Fmistral-orpo-beta)
 - [AlpacaEval](#alpacaeval)
 - [MT-Bench](#mt-bench)
