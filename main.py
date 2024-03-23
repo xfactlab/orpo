@@ -77,8 +77,8 @@ class ORPO(object):
         os.makedirs(self.log_dir, exist_ok=True)
 
     def preprocess_dataset(self, examples: Union[List, Dict]):
-        if 'instruction' in examples.keys():
-            prompt_key = 'instruction'
+        if ('instruction' in examples.keys()) or ('question' in examples.keys()):
+            prompt_key = 'instruction' if 'instruction' in examples.keys() else 'question'
             prompt = [self.tokenizer.apply_chat_template([{'role': 'user', 'content': item}], tokenize=False, add_generation_prompt=True) for item in examples[prompt_key]]
             chosen = [self.tokenizer.apply_chat_template([{'role': 'user', 'content': item_prompt}, {'role': 'assistant', 'content': item_chosen}], tokenize=False) for item_prompt, item_chosen in zip(examples[prompt_key], examples['chosen'])]
             rejected = [self.tokenizer.apply_chat_template([{'role': 'user', 'content': item_prompt}, {'role': 'assistant', 'content': item_rejected}], tokenize=False) for item_prompt, item_rejected in zip(examples[prompt_key], examples['rejected'])]
@@ -114,6 +114,9 @@ class ORPO(object):
     def filter_dataset(self, examples: Union[List, Dict]):
         if 'instruction' in examples.keys():
             query = examples['instruction']
+            prompt_length = self.tokenizer.apply_chat_template([{'content': query, 'role': 'user'}], tokenize=True, add_generation_prompt=True, return_tensors='pt').size(-1)
+        elif 'question' in examples.keys():
+            query = examples['question']
             prompt_length = self.tokenizer.apply_chat_template([{'content': query, 'role': 'user'}], tokenize=True, add_generation_prompt=True, return_tensors='pt').size(-1)
         else:
             prompt_length = self.tokenizer.apply_chat_template([examples['chosen'][0]], tokenize=True, add_generation_prompt=True, return_tensors='pt').size(-1)  
