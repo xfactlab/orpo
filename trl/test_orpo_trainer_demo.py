@@ -78,7 +78,7 @@ def build_dataset(tokenizer):
     def chat_template_to_text(sample):
         sample["chosen"] = [tokenizer.apply_chat_template(item_chosen, tokenize=False) for item_chosen in sample['chosen']]
         sample["rejected"] = [tokenizer.apply_chat_template(item_rejected, tokenize=False) for item_rejected in sample['rejected']]
-        sample['prompt'] = [tokenizer.apply_chat_template([{'role': 'user', 'content': item[0]}], tokenize=False, add_generation_prompt=True) for item in sample['chosen']]
+        sample['prompt'] = [tokenizer.apply_chat_template([item[0]], tokenize=False, add_generation_prompt=True) for item in sample['chosen']]
         
         return sample
     
