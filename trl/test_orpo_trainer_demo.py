@@ -1,17 +1,3 @@
-# coding=utf-8
-# Copyright 2022 The HuggingFace Inc. team. All rights reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 
 from dataclasses import dataclass, field
 from typing import Optional
@@ -26,35 +12,12 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 from trl import ORPOConfig, ORPOTrainer, set_seed
 from trl.core import LengthSampler
 
+# This code is built on top of the example code from Huggingface TRL Team
 
 tqdm.pandas()
 
-########################################################################
-# This is a fully working simple example to use trl with accelerate.
-#
-# This example fine-tunes a T5 model on the IMDB dataset using PPO
-# (proximal policy optimization).
-# in any of the following settings (with the same script):
-#   - single CPU or single GPU
-#   - multi GPUS (using PyTorch distributed mode)
-#   - multi GPUS (using DeepSpeed ZeRO-Offload stages 1 & 2)
-#   - fp16 (mixed-precision) or fp32 (normal precision)
-#
-# To run it in each of these various modes, first initialize the accelerate
-# configuration with `accelerate config` then run the script with
-# `accelerate launch ppo-sentiment-t5-small.py`
-#
-########################################################################
-
-
-# We first define the configuration of the experiment, defining the model, the dataset,
-# the training parameters, and the PPO parameters.
-# Check the default arguments in the `PPOConfig` class for more details.
-
 @dataclass
 class ScriptArguments:
-    # NOTE: gpt2 models use Conv1D instead of Linear layers which are not yet supported in 8 bit mode
-    # models like gpt-neo* models are more suitable.
     model_name: Optional[str] = field(default="microsoft/phi-2", metadata={"help": "the model name"})
     optim: Optional[str] = field(default="adamw_torch", metadata={"help": "the model name"})
     data_name: Optional[str] = field(default="argilla/dpo-mix-7k", metadata={"help": "the model name"})
