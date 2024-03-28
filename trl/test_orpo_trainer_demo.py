@@ -20,7 +20,7 @@ tqdm.pandas()
 class ScriptArguments:
     model_name: Optional[str] = field(default="microsoft/phi-2", metadata={"help": "the model name"})
     optim: Optional[str] = field(default="adamw_torch", metadata={"help": "the model name"})
-    data_name: Optional[str] = field(default="argilla/dpo-mix-7k", metadata={"help": "the model name"})
+    data_name: Optional[str] = field(default="argilla/ultrafeedback-binarized-preferences-cleaned", metadata={"help": "the model name"})
     cache_dir: Optional[str] = field(default="", metadata={"help": "the model name"})
     log_with: Optional[str] = field(default='wandb', metadata={"help": "use 'wandb' to log with wandb"})
     output_dir: Optional[str] = field(default='', metadata={"help": "use 'wandb' to log with wandb"})
@@ -52,12 +52,11 @@ config = ORPOConfig(
     lr_scheduler_type=script_args.lr_scheduler_type,
     gradient_checkpointing=True, 
     gradient_checkpointing_kwargs={'use_reentrant':True},
-    evaluation_strategy='epoch',
     beta=script_args.beta,
     report_to='wandb',
     num_train_epochs=script_args.num_train_epochs,
     bf16=True,
-    do_eval=True
+    do_eval=False
 )   
 
 model = AutoModelForCausalLM.from_pretrained(script_args.model_name,
@@ -72,29 +71,25 @@ tokenizer.chat_template = "{% for message in messages %}\n{% if message['role'] 
 def build_dataset(tokenizer):
     ds_train = load_dataset(script_args.data_name, split="train",
                             cache_dir=script_args.cache_dir)
-    ds_test = load_dataset(script_args.data_name, split="test",
-                           cache_dir=script_args.cache_dir)
 
     def chat_template_to_text(sample):
-        sample["chosen"] = [tokenizer.apply_chat_template(item_chosen, tokenize=False) for item_chosen in sample['chosen']]
-        sample["rejected"] = [tokenizer.apply_chat_template(item_rejected, tokenize=False) for item_rejected in sample['rejected']]
-        sample['prompt'] = [tokenizer.apply_chat_template([item[0]], tokenize=False, add_generation_prompt=True) for item in sample['chosen']]
+        sample["chosen"] = [item_chosen[1]['content'] for item_chosen in sample['chosen']]
+        sample["rejected"] = [item_rejected[1]['content'] for item_rejected in sample['rejected']]
+        sample['prompt'] = [tokenizer.apply_chat_template([{'role': 'user', 'content': item_prompt}], tokenize=False, add_generation_prompt=True) for item_prompt in sample['prompt']]
         
         return sample
     
     ds_train = ds_train.map(chat_template_to_text, batched=True, num_proc=8)
-    ds_test = ds_test.map(chat_template_to_text, batched=True, num_proc=8)
-    
-    return ds_train, ds_test
 
-train, test = build_dataset(tokenizer=tokenizer)
+    return ds_train
+
+train = build_dataset(tokenizer=tokenizer)
 
 trainer = ORPOTrainer(
                 model=model,
                 args=config,
                 tokenizer=tokenizer,
-                train_dataset=train,
-                eval_dataset=test
+                train_dataset=train
             )
 
 trainer.train()
