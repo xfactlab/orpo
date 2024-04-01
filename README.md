@@ -3,7 +3,7 @@
 ### **`Updates (24.03.25)`**
 - [X] Sample script for ORPOTrainer in 🤗<a class="link" href="https://github.com/huggingface/trl">TRL</a> is added to `trl/test_orpo_trainer_demo.py`
 - [X] New model, 🤗<a class="link" href="https://huggingface.co/kaist-ai/mistral-orpo-capybara-7k">kaist-ai/mistral-orpo-capybara-7k</a>, is added to 🤗<a class="link" href="https://huggingface.co/collections/kaist-ai/orpo-65efef87544ba100aef30013">ORPO Collection</a> 
-- [X] Now you can try ORPO in 🤗<a class="link" href="https://github.com/huggingface/trl">TRL</a> and <a class="link" href="https://github.com/OpenAccess-AI-Collective/axolotl">Axolotl</a>🔥
+- [X] Now you can try ORPO in 🤗<a class="link" href="https://github.com/huggingface/trl">TRL</a>, <a class="link" href="https://github.com/OpenAccess-AI-Collective/axolotl">Axolotl</a> and <a class="link" href="https://github.com/hiyouga/LLaMA-Factory">LLaMA-Factory</a>🔥
 - [X] We are making general guideline for training LLMs with ORPO, stay tuned🔥
 - [X] **Mistral-ORPO-β** achieved a 14.7% in the length-controlled (LC) win rate on <a class="link" href="https://tatsu-lab.github.io/alpaca_eval/">official AlpacaEval Leaderboard</a>🔥
 
