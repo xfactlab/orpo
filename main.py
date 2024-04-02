@@ -119,7 +119,7 @@ class ORPO(object):
             query = examples['question']
             prompt_length = self.tokenizer.apply_chat_template([{'content': query, 'role': 'user'}], tokenize=True, add_generation_prompt=True, return_tensors='pt').size(-1)
         else:
-            prompt_length = self.tokenizer.apply_chat_template([examples['chosen'][0]], tokenize=True, add_generation_prompt=True, return_tensors='pt').size(-1)  
+            prompt_length = self.tokenizer.apply_chat_template(examples['chosen'][:-1], tokenize=True, add_generation_prompt=True, return_tensors='pt').size(-1)  
            
         if prompt_length < self.args.prompt_max_length:    
             return True
