@@ -55,8 +55,8 @@ class ORPOTrainer(Trainer):
                                'labels': pos_labels,}, output_hidden_states=True)
             
         # Calculate NLL loss
-        pos_loss = self.compute_custom_loss(logits=outputs_pos.logits, labels=inputs['positive_input_ids']) 
-
+        pos_loss = outputs_pos.loss
+        
         # Calculate Log Probability
         pos_prob = self.compute_logps(prompt_attention_mask=inputs['attention_mask'], 
                                       chosen_inputs=inputs['positive_input_ids'], 
