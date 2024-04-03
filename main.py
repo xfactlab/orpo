@@ -12,6 +12,7 @@ from transformers import (
     TrainingArguments,
     DataCollatorForLanguageModeling
 )
+from peft import LoraConfig, get_peft_model
 
 from src.args import default_args
 from src.orpo_trainer import ORPOTrainer
@@ -43,6 +44,22 @@ class ORPO(object):
             self.model = AutoModelForCausalLM.from_pretrained(self.args.model_name, 
                                                               cache_dir=self.args.cache_dir,
                                                               torch_dtype=torch.bfloat16)
+            
+        if self.args.enable_lora:
+            peft_config = LoraConfig(
+                lora_alpha=self.args.lora_alpha,
+                lora_dropout=self.args.lora_dropout,
+                r=self.args.lora_rank,
+                task_type="CAUSAL_LM",
+            )
+
+            self.model.enable_input_require_grads()
+
+            self.model = get_peft_model(self.model, peft_config=peft_config)
+            print("     2-1. LoRA adapter applied!")
+            self.model.print_trainable_parameters()
+        else:
+            pass
                                                           
         # Load Dataset
         print(">>> 3. Loading Dataset")
@@ -137,13 +154,13 @@ class ORPO(object):
             num_train_epochs=self.args.num_train_epochs,  # number of training epochs
             per_device_train_batch_size=self.args.per_device_train_batch_size,  # batch size for training
             per_device_eval_batch_size=self.args.per_device_eval_batch_size,  # batch size for evaluation
-            evaluation_strategy=self.args.evaluation_strategy if self.is_test else 'no',  # batch size for evaluation
+            evaluation_strategy=self.args.evaluation_strategy if self.is_test else 'no',  
             save_strategy=self.args.evaluation_strategy,
             optim=self.args.optim,
             warmup_steps=self.args.warmup_steps,
             gradient_accumulation_steps=self.args.gradient_accumulation_steps,
-            gradient_checkpointing=True, #if ('llama' in self.args.model_name.lower()) or ('mistral' in self.args.model_name.lower()) else False,
-            gradient_checkpointing_kwargs={'use_reentrant':True},
+            gradient_checkpointing=True, 
+            gradient_checkpointing_kwargs={'use_reentrant': False if self.args.enable_lora else True},
             load_best_model_at_end=self.is_test,
             do_train=True,
             do_eval=self.is_test,

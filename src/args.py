@@ -24,6 +24,13 @@ def default_args(parser):
     parser.add_argument("--response_max_length", default=1024, type=int)
     parser.add_argument("--alpha", default=1.0, type=float, help="Hyperparameter for weighting L_OR")
 
+    # LoRA
+    parser.add_argument("--enable_lora", action='store_true')
+    parser.add_argument("--lora_alpha", default=16, type=int)
+    parser.add_argument("--lora_rank", default=64, type=int)
+    parser.add_argument("--lora_dropout", default=0.1, type=int)
+
+
     # Wandb Configurations
     parser.add_argument("--wandb_entity", default=None, type=str)
     parser.add_argument("--wandb_project_name", default=None, type=str)
