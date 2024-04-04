@@ -178,6 +178,7 @@ class ORPO(object):
             model=self.model,
             alpha=self.args.alpha,
             pad=self.tokenizer.pad_token_id,
+            disable_prompt_loss=self.args.disable_prompt_loss,
             args=arguments,
             train_dataset=self.train,
             eval_dataset=self.test if self.is_test else None,
@@ -188,6 +189,9 @@ class ORPO(object):
     def run(self):
         print(">>> 5. Preparing ORPOTrainer")
         self.prepare_trainer()
+
+        if self.args.disable_prompt_loss:
+            print("Discarding Prompt Tokens for NLL Loss")
         self.trainer.train()
 
         # Saving code for FSDP
