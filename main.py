@@ -1,4 +1,3 @@
-
 import os
 import time
 import wandb
@@ -10,7 +9,8 @@ from transformers import (
     AutoTokenizer,
     AutoModelForCausalLM,
     TrainingArguments,
-    DataCollatorForLanguageModeling
+    DataCollatorForLanguageModeling,
+    set_seed,
 )
 from peft import LoraConfig, get_peft_model
 
@@ -168,7 +168,8 @@ class ORPO(object):
             remove_unused_columns=False,
             report_to='wandb',
             run_name=self.run_name,
-            bf16=True
+            bf16=True,
+            seed=self.args.seed,
         )
         
         data_collator = DataCollatorForLanguageModeling(tokenizer=self.tokenizer, mlm=False)
@@ -198,6 +199,9 @@ class ORPO(object):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser("ORPO")
     args = default_args(parser)
+
+    # Set the random seed for the entire pipeline
+    set_seed(args.seed)
 
     # Set WANDB configurations
     if args.wandb_entity is not None and args.wandb_project_name is not None:

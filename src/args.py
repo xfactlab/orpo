@@ -23,6 +23,7 @@ def default_args(parser):
     parser.add_argument("--prompt_max_length", default=256, type=int)
     parser.add_argument("--response_max_length", default=1024, type=int)
     parser.add_argument("--alpha", default=1.0, type=float, help="Hyperparameter for weighting L_OR")
+    parser.add_argument("--seed", default=42, type=int, help="Random seed for reproducibility.")
 
     # LoRA
     parser.add_argument("--enable_lora", action='store_true')
