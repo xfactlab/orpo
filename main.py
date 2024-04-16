@@ -77,6 +77,15 @@ class ORPO(object):
             print("     2-1. LoRA adapter applied!")
             self.model.print_trainable_parameters()
         else:
+            if args.quantization_bit is not None:
+                print("     2-1. Quantization adapter applied! without LoRa")
+                peft_config = LoraConfig(
+                    lora_alpha=self.args.lora_alpha,
+                    lora_dropout=self.args.lora_dropout,
+                    r=self.args.lora_rank,
+                    task_type="CAUSAL_LM",
+                )
+                self.model.add_adapter(peft_config)
             pass
                                                           
         # Load Dataset
