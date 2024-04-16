@@ -33,10 +33,10 @@ def default_args(parser):
     parser.add_argument("--lora_dropout", default=0.1, type=int)
 
     # Quantization
-    parser.add_argument("--quantization_bit", default=None)
-    parser.add_argument("--quantization_type", default=None)
-    parser.add_argument("--double_quantization", default=None)
-    parser.add_argument("--compute_dtype", default=None)
+    parser.add_argument("--quantization_bit", default=4)
+    parser.add_argument("--quantization_type", default='nf4')
+    parser.add_argument("--double_quantization", default=True)
+    parser.add_argument("--compute_dtype", action='set in main.py > args.compute_dtype = torch.bfloat16')
 
     # Wandb Configurations
     parser.add_argument("--wandb_entity", default=None, type=str)
