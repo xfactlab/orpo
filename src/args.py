@@ -32,6 +32,11 @@ def default_args(parser):
     parser.add_argument("--lora_rank", default=64, type=int)
     parser.add_argument("--lora_dropout", default=0.1, type=int)
 
+    # Quantization
+    parser.add_argument("--quantization_bit", default=None)
+    parser.add_argument("--quantization_type", default=None)
+    parser.add_argument("--double_quantization", default=None)
+    parser.add_argument("--compute_dtype", default=None)
 
     # Wandb Configurations
     parser.add_argument("--wandb_entity", default=None, type=str)
