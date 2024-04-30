@@ -33,8 +33,10 @@ class ORPOTrainer(Trainer):
         mask = chosen_attention_mask[:, :-1] - prompt_attention_mask[:, 1:]
         selected_index = (mask * chosen_inputs[:, 1:]).unsqueeze(2)
         # when using quantization indexs could be negative values
-        selected_index[selected_index < 0] = 0
-        per_token_logps = torch.gather(logits[:, :-1, :].log_softmax(-1), dim=2, 
+        filtered_logits = logits[:, :-1, :].log_softmax(-1)
+        selected_index[selected_index < 0] += filtered_logits.size(1)
+
+        per_token_logps = torch.gather(filtered_logits, dim=2, 
                                        index=selected_index).squeeze(2)
         return torch.mul(per_token_logps, mask.to(dtype=torch.bfloat16)).sum(dim=1).to(dtype=torch.float64) / mask.sum(dim=1).to(dtype=torch.float64)
         
