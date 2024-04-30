@@ -1,7 +1,7 @@
 # **ORPO**
 
 ### **`Updates (24.04.16)`**
-- [X] Quantization options is added to `src/args.py` - oops! loss calculation is wrong. i suggest that use llm evaluation after train. do not see the loss.
+- [X] Quantization options is added to `src/args.py`
 
 ### **`Updates (24.03.25)`**
 - [X] Sample script for ORPOTrainer in 🤗<a class="link" href="https://github.com/huggingface/trl">TRL</a> is added to `trl/test_orpo_trainer_demo.py`
