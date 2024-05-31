@@ -32,6 +32,7 @@ class ORPO(object):
         else:
             pass
         self.tokenizer.pad_token_id = self.tokenizer.eos_token_id
+        self.tokenizer.padding_side = 'right'
 
         # Load Model
         print(">>> 2. Loading Model")
