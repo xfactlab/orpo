@@ -78,7 +78,7 @@ class ORPOTrainer(Trainer):
                                       logits=outputs_neg.logits)
 
         # Calculate log odds
-        log_odds = (pos_prob - neg_prob) - (torch.log(1 - torch.exp(pos_prob)) - torch.log(1 - torch.exp(neg_prob)))
+        log_odds = (pos_prob - neg_prob) - (torch.log1p(-torch.exp(pos_prob)) - torch.log1p(-torch.exp(neg_prob)))
         sig_ratio = torch.nn.functional.sigmoid(log_odds)
         ratio = torch.log(sig_ratio)
         
