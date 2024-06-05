@@ -44,7 +44,7 @@ class ORPO(object):
         else:
             self.model = AutoModelForCausalLM.from_pretrained(self.args.model_name, 
                                                               cache_dir=self.args.cache_dir,
-                                                              torch_dtype=torch.bfloat16)
+                                                              torch_dtype=torch.float16)
             
         if self.args.enable_lora:
             peft_config = LoraConfig(
