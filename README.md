@@ -1,5 +1,8 @@
 # **ORPO**
 
+### **`Updates (24.04.16)`**
+- [X] Quantization options is added to `src/args.py`
+
 ### **`Updates (24.03.25)`**
 - [X] Sample script for ORPOTrainer in 🤗<a class="link" href="https://github.com/huggingface/trl">TRL</a> is added to `trl/test_orpo_trainer_demo.py`
 - [X] New model, 🤗<a class="link" href="https://huggingface.co/kaist-ai/mistral-orpo-capybara-7k">kaist-ai/mistral-orpo-capybara-7k</a>, is added to 🤗<a class="link" href="https://huggingface.co/collections/kaist-ai/orpo-65efef87544ba100aef30013">ORPO Collection</a> 

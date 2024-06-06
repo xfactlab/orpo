@@ -1,3 +1,5 @@
+import torch
+
 def default_args(parser):
     parser.add_argument("--cache_dir", default=None, type=str)
     parser.add_argument("--save_dir", default='./saved', type=str)
@@ -11,10 +13,10 @@ def default_args(parser):
     parser.add_argument("--optim", default="paged_adamw_32bit", type=str)
     parser.add_argument("--overwrite_output_dir", default=True, type=bool)
     parser.add_argument("--lr", default=2e-5, type=float)
-    parser.add_argument("--num_proc", default=8, type=int)
-    parser.add_argument("--num_train_epochs", default=10, type=int)
-    parser.add_argument("--per_device_train_batch_size", default=2, type=int)
-    parser.add_argument("--per_device_eval_batch_size", default=2, type=int)
+    parser.add_argument("--num_proc", default=2, type=int)
+    parser.add_argument("--num_train_epochs", default=2, type=int)
+    parser.add_argument("--per_device_train_batch_size", default=1, type=int)
+    parser.add_argument("--per_device_eval_batch_size", default=1, type=int)
     parser.add_argument("--warmup_steps", default=5000, type=int)    
     parser.add_argument("--evaluation_strategy", default='epoch', type=str)
     parser.add_argument("--do_eval", action='store_true')
@@ -32,6 +34,11 @@ def default_args(parser):
     parser.add_argument("--lora_rank", default=64, type=int)
     parser.add_argument("--lora_dropout", default=0.1, type=int)
 
+    # Quantization
+    parser.add_argument("--quantization_bit", default=4)
+    parser.add_argument("--quantization_type", default='nf4')
+    parser.add_argument("--double_quantization", default=True)
+    parser.add_argument("--compute_dtype", default=torch.bfloat16)
 
     # Wandb Configurations
     parser.add_argument("--wandb_entity", default=None, type=str)

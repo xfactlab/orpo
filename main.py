@@ -11,7 +11,9 @@ from transformers import (
     TrainingArguments,
     DataCollatorForLanguageModeling,
     set_seed,
+    BitsAndBytesConfig,
 )
+from transformers.utils.versions import require_version
 from peft import LoraConfig, get_peft_model
 
 from src.args import default_args
@@ -34,16 +36,32 @@ class ORPO(object):
         self.tokenizer.pad_token_id = self.tokenizer.eos_token_id
         self.tokenizer.padding_side = 'right'
 
+        quantization_config = None
+
+        if args.quantization_bit is not None:  # bnb
+            if args.quantization_bit == 8:
+                quantization_config = BitsAndBytesConfig(load_in_8bit=True)
+
+            elif args.quantization_bit == 4:
+                quantization_config = BitsAndBytesConfig(
+                    load_in_4bit=True,
+                    bnb_4bit_compute_dtype=args.compute_dtype,
+                    bnb_4bit_use_double_quant=args.double_quantization,
+                    bnb_4bit_quant_type=args.quantization_type,
+                )
+
         # Load Model
         print(">>> 2. Loading Model")
         if self.args.flash_attention_2:
             self.model = AutoModelForCausalLM.from_pretrained(self.args.model_name, 
                                                               cache_dir=self.args.cache_dir,
                                                               torch_dtype=torch.bfloat16,
+                                                              quantization_config=quantization_config,
                                                               attn_implementation="flash_attention_2")
         else:
             self.model = AutoModelForCausalLM.from_pretrained(self.args.model_name, 
                                                               cache_dir=self.args.cache_dir,
+                                                              quantization_config=quantization_config,
                                                               torch_dtype=torch.bfloat16)
             
         if self.args.enable_lora:
@@ -60,6 +78,15 @@ class ORPO(object):
             print("     2-1. LoRA adapter applied!")
             self.model.print_trainable_parameters()
         else:
+            if args.quantization_bit is not None:
+                print("     2-1. Quantization adapter applied! without LoRa")
+                peft_config = LoraConfig(
+                    lora_alpha=self.args.lora_alpha,
+                    lora_dropout=self.args.lora_dropout,
+                    r=self.args.lora_rank,
+                    task_type="CAUSAL_LM",
+                )
+                self.model.add_adapter(peft_config)
             pass
                                                           
         # Load Dataset
@@ -215,6 +242,9 @@ if __name__ == '__main__':
     else:
         pass
     os.environ["TOKENIZERS_PARALLELISM"] = 'false'
+
+    # set dtype here
+    args.compute_dtype = torch.bfloat16
 
     print("================================================================================================\n")
     print(f">>> Fine-tuning {args.model_name} with ORPO on {args.data_name}\n")
